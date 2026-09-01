@@ -324,12 +324,19 @@ tmp = [['grid_label','https://raw.githubusercontent.com/WCRP-CMIP/CMIP6_CVs/mast
 
 #%% License
 license_ = (
+    r'^Data in this file is licensed under.*',
+    r'^Data in this file produced by .* is licensed under.*',
+    r'^Data in this file is licensed under'
+    r' a Creative Commons Attribution-ShareAlike 4.0 International License.*',
+    r'^Data in this file is licensed under'
+    r' a Creative Commons Attribution-ShareAlike 4.0 International License'
+    r' (https://creativecommons.org/licenses/).*',
     r'^Data in this file produced by .* is licensed under'
     r' a Creative Commons Attribution-ShareAlike 4.0 International License'
     r' (https://creativecommons.org/licenses/). Use of the data must be'
-    r' acknowledged following guidelines found at .*.'
+    r' acknowledged following guidelines found at .*'
     r' Further information about this data, including some limitations,'
-    r' can be found via .*.'
+    r' can be found via .*'
 )
 
 #%% Nominal resolution
@@ -683,7 +690,7 @@ for count,CV in enumerate(CVJsonList):
         obs4MIPs_CV['CV'].update(eval(CV))
 # Add static entries to obs4MIPs_CV.json
 obs4MIPs_CV['CV']['activity_id'] = ['obs4MIPs']
-obs4MIPs_CV['CV']['license'] = [license_] 
+obs4MIPs_CV['CV']['license'] = license_
 
 # Write demo obs4MIPs_CV.json
 if os.path.exists('Tables/obs4MIPs_CV.json'):
