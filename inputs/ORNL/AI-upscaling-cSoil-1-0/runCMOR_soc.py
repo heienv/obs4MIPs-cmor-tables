@@ -1,69 +1,133 @@
-import cmor
-import xarray as xr
-import xcdat as xc
-import numpy as np
+"""Create separate CMOR files for the two cumulative SOC depth products."""
+
+import argparse
+import importlib.metadata
 import json
-import sys, os
+import subprocess
+from pathlib import Path
 
-sys.path.append("../../misc")  # Path to obs4MIPsLib used to trap provenance
-import obs4MIPsLib
+import cmor
+import netCDF4
+import numpy as np
 
-cmorTable = "../..Tables/obs4MIPs_fx.json"  # Aday,Amon,Lmon,Omon,SImon,fx,monNobs,monStderr - Load target table, axis info (coordinates, grid*) and CVs
-inputJson = "soc.json"  # Update contents of this file to set your global_attributes
-inputFilePath = "soc_data_test.nc"
-inputVarName = "SOC_100cm_mean"
-outputVarName = "cSoil"
-outputUnits = "kg m-2"
 
-# Open and read input netcdf file, get coordinates and add bounds
-f = xc.open_dataset(inputFilePath, decode_times=False)
-d = f[inputVarName]
-lat = f.lat.values
-lon = f.lon.values
-time = f.time.values
-f = f.bounds.add_missing_bounds(axes=["X", "Y"])
-f = f.bounds.add_bounds("T")
-tbds = f.time_bnds.values
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPOSITORY_ROOT = SCRIPT_DIR.parents[2]
+TABLES = REPOSITORY_ROOT / "Tables"
 
-# CONVERT UNITS FROM mm/day to kg/m2/s
-# d = np.divide(d,86400.)
-# d = np.where(np.isnan(d),1.e20,d)
 
-# Initialize and run CMOR. For more information see https://cmor.llnl.gov/mydoc_cmor3_api/
-cmor.setup(
-    inpath="./", netcdf_file_action=cmor.CMOR_REPLACE_4
-)  # ,logfile='cmorLog.txt')
-cmor.dataset_json(inputJson)
-cmor.load_table(cmorTable)
-cmor.set_cur_dataset_attribute("history", f.history)
+def processing_code_location():
+    commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=REPOSITORY_ROOT, text=True
+    ).strip()
+    return (
+        "https://github.com/PCMDI/obs4MIPs-cmor-tables/tree/"
+        f"{commit}/inputs/ORNL/AI-upscaling-cSoil-1-0"
+    )
 
-# Create CMOR axes
-cmorLat = cmor.axis(
-    "latitude", coord_vals=lat[:], cell_bounds=f.lat_bnds.values, units="degrees_north"
-)
-cmorLon = cmor.axis(
-    "longitude", coord_vals=lon[:], cell_bounds=f.lon_bnds.values, units="degrees_east"
-)
-cmorTime = cmor.axis("time", coord_vals=time[:], cell_bounds=tbds, units=f.time.units)
-cmoraxes = [cmorTime, cmorLat, cmorLon]
 
-# Setup units and create variable to write using cmor - see https://cmor.llnl.gov/mydoc_cmor3_api/#cmor_set_variable_attribute
-varid = cmor.variable(outputVarName, outputUnits, cmoraxes, missing_value=1.0e20)
-values = np.array(d, np.float32)[:]
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input-dir", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    args = parser.parse_args()
 
-# Append valid_min and valid_max to variable before writing using cmor - see https://cmor.llnl.gov/mydoc_cmor3_api/#cmor_set_variable_attribute
-cmor.set_variable_attribute(varid, "valid_min", "f", 2.0)
-cmor.set_variable_attribute(varid, "valid_max", "f", 3.0)
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    base_metadata = json.loads((SCRIPT_DIR / "soc.json").read_text())
+    base_metadata.update(
+        outpath=str(output_dir),
+        has_aux_unc="FALSE",
+        processing_code_location=processing_code_location(),
+        comment=(
+            "The complete source rectangle is retained without regridding. "
+            "Cumulative 0-30 cm and 0-100 cm stocks are stored in separate "
+            "files and must not be summed."
+        ),
+        history=(
+            "Original source raster values and masks retained; latitude and "
+            "data rows reversed together; no time coordinate or spatial "
+            "resampling; converted with CMOR."
+        ),
+    )
 
-# Provenance info - produces global attribute <obs4MIPs_GH_Commit_ID>
-gitinfo = obs4MIPsLib.ProvenanceInfo(obs4MIPsLib.getGitInfo("./"))
-full_git_path = f"https://github.com/PCMDI/obs4MIPs-cmor-tables/tree/{gitinfo['commit_number']}/demo"
-cmor.set_cur_dataset_attribute("processing_code_location", f"{full_git_path}")
-#
-# Prepare variable for writing, then write and close file - see https://cmor.llnl.gov/mydoc_cmor3_api/#cmor_set_variable_attribute
-cmor.set_deflate(
-    varid, 1, 1, 1
-)  # shuffle=1,deflate=1,deflate_level=1 - Deflate options compress file data
-cmor.write(varid, d, len(time))
-cmor.close()
-f.close()
+    products = []
+    for depth_cm in (30, 100):
+        metadata = dict(base_metadata)
+        metadata["variant_label"] = f"ORNL-0to{depth_cm}cm"
+        metadata["variant_info"] = (
+            f"Prepared at ORNL from the cumulative 0-{depth_cm} cm SOC mean. "
+            "The depth-specific label distinguishes the two overlapping "
+            "cumulative products."
+        )
+        input_json = output_dir / f"cmor_input_{depth_cm}cm.json"
+        input_json.write_text(json.dumps(metadata, indent=2) + "\n")
+
+        staging_path = args.input_dir / f"SOC_0-{depth_cm}cm_staging.nc"
+        with netCDF4.Dataset(staging_path) as source:
+            cmor.setup(
+                inpath=str(TABLES),
+                netcdf_file_action=cmor.CMOR_REPLACE_4,
+                exit_control=cmor.CMOR_EXIT_ON_MAJOR,
+                logfile=str(output_dir / f"cmor_{depth_cm}cm.log"),
+            )
+            cmor.dataset_json(str(input_json))
+            cmor.load_table("obs4MIPs_fx.json")
+            cmor.set_cur_dataset_attribute(
+                "geospatial_coverage",
+                (
+                    "Original 30 arc-second rectangle: 180 W to 55 W, "
+                    "15 N to 80 N; source mask retained"
+                ),
+            )
+            cmor.set_cur_dataset_attribute(
+                "source_doi", "10.5281/zenodo.8057232"
+            )
+
+            latitude = cmor.axis(
+                "latitude",
+                coord_vals=source["lat"][:],
+                cell_bounds=source["lat_bnds"][:],
+                units="degrees_north",
+            )
+            longitude = cmor.axis(
+                "longitude",
+                coord_vals=source["lon"][:],
+                cell_bounds=source["lon_bnds"][:],
+                units="degrees_east",
+            )
+            depth = cmor.axis(
+                "sdepth",
+                coord_vals=np.array([depth_cm / 200.0]),
+                cell_bounds=np.array([[0.0, depth_cm / 100.0]]),
+                units="m",
+            )
+            variable = cmor.variable(
+                "cSoil",
+                "kg m-2",
+                [depth, latitude, longitude],
+                missing_value=1e20,
+            )
+            cmor.set_deflate(variable, 1, 1, 2)
+            values = np.asarray(
+                source["cSoil"][:].filled(1e20), dtype="float32"
+            )[None, :, :]
+            cmor.write(variable, values)
+            output = cmor.close(variable, file_name=True)
+            cmor.close()
+
+        if isinstance(output, bytes):
+            output = output.decode()
+        products.append({"depth_cm": [0, depth_cm], "output": output})
+        print(output, flush=True)
+
+    report = {
+        "cmor_version": importlib.metadata.version("cmor"),
+        "products": products,
+    }
+    (output_dir / "run.json").write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report, indent=2))
+
+
+if __name__ == "__main__":
+    main()
