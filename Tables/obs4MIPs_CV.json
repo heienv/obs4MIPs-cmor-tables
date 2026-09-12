@@ -2433,7 +2433,7 @@
                 "source_version_number":"V3"
             },
             "AI-upscaling-cSoil-1-0":{
-                "region":"contiguous_united_states",
+                "region":"north_america",
                 "source":"AI-upscaling-cSoil 1 (2024): Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning",
                 "source_type":"AI_upscaling",
                 "source_version_number":"1"

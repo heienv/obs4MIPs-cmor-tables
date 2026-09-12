@@ -16,6 +16,7 @@ def validate(input_dir,output_dir):
     cv=json.loads((ROOT/'Tables/obs4MIPs_CV.json').read_text())['CV']
     reports=[]
     tracking=[]
+    variants={30:'ORNL-r1',100:'ORNL-r2'}
     for entry in run['products']:
         depth=entry['depth_cm'][1]
         path=Path(entry['output'])
@@ -29,8 +30,8 @@ def validate(input_dir,output_dir):
             assert target['cSoil'].standard_name=='soil_mass_content_of_carbon'
             assert target['cSoil'].dtype==np.dtype('float32')
             assert target.has_aux_unc=='FALSE'
-            assert target.variant_label==f'ORNL-0to{depth}cm'
-            assert path.name==f'cSoil_fx_AI-upscaling-cSoil-1-0_ORNL-0to{depth}cm_gn.nc'
+            assert target.variant_label==variants[depth]
+            assert path.name==f'cSoil_fx_AI-upscaling-cSoil-1-0_{variants[depth]}_gn.nc'
             missing=set(cv['required_global_attributes'])-set(target.ncattrs())
             assert not missing,missing
             tracking.append(str(uuid.UUID(target.tracking_id)))

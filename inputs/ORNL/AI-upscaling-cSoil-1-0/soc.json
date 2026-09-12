@@ -19,6 +19,7 @@
     "output_file_template": "<variable_id><frequency><source_id><variant_label><grid_label>",
     "output_path_template": "<activity_id>/<institution_id>/<source_id>/<frequency>/<variable_id>/<grid_label>/<version>",
     "product": "observations",
+    "region": "north_america",
     "references": "Wang, Z., Kumar, J., Weintraub-Leff, S. R., Todd-Brown, K., Mishra, U., & Sihi, D. (2024). Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning. Journal of Geophysical Research: Biogeosciences, 129, e2023JG007702. https://doi.org/10.1029/2023JG007702",
     "source_id": "AI-upscaling-cSoil-1-0",
     "title": "AI-upscaling-cSoil 1 (2024): Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning",

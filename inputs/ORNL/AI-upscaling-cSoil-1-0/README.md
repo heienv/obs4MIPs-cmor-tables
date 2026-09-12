@@ -21,8 +21,8 @@ resolution. Their complete rectangular grid is retained: 180 W to 55 W and
 missing-data masks, and coordinates are not cropped or spatially resampled.
 
 The products are cumulative stocks over overlapping intervals. They are
-therefore written as separate files, provisionally distinguished by variant
-labels `ORNL-0to30cm` and `ORNL-0to100cm`. They must not be treated as adjacent
+therefore written as separate files, distinguished by variant labels `ORNL-r1`
+for 0--30 cm and `ORNL-r2` for 0--100 cm. They must not be treated as adjacent
 layers or summed.
 
 ## Reproduce
@@ -50,11 +50,10 @@ increasing coordinate requirement. It performs no numeric unit conversion:
 `kg C m-2` in the source represents the same carbon mass per area encoded as
 the CF unit `kg m-2` for `soil_mass_content_of_carbon`.
 
-## Review items
+## Metadata decisions
 
-The code uses `grid_label=gn` because it preserves the source grid. The current
-source registration says `contiguous_united_states`, while valid cells in the
-complete source footprint also cover Alaska, Hawaii, and Puerto Rico. Maintainer
-review is requested for the final region value, the `gn`/`gr` choice, and the
-depth-specific file identifiers. After those decisions, the full products must
-be regenerated from the merged tables before ESGF publication.
+Following maintainer guidance on 11 September 2026, the products use
+`grid_label=gn`, region `north_america`, and variant labels `ORNL-r1` and
+`ORNL-r2`. `cSoil` is encoded as `fx` because each source GeoTIFF provides one
+spatial estimate and no time coordinate. This describes the temporal structure
+of this dataset; it does not imply that soil carbon is physically invariant.

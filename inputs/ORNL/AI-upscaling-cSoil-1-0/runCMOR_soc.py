@@ -52,9 +52,10 @@ def main():
     )
 
     products = []
+    variants = {30: "ORNL-r1", 100: "ORNL-r2"}
     for depth_cm in (30, 100):
         metadata = dict(base_metadata)
-        metadata["variant_label"] = f"ORNL-0to{depth_cm}cm"
+        metadata["variant_label"] = variants[depth_cm]
         metadata["variant_info"] = (
             f"Prepared at ORNL from the cumulative 0-{depth_cm} cm SOC mean. "
             "The depth-specific label distinguishes the two overlapping "
