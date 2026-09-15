@@ -36,7 +36,7 @@
         "AI-upscaling-cSoil-1-0":{
             "institution_id":"EmoryU",
             "region":[
-                "north_america"
+                "contiguous_united_states"
             ],
             "release_year":"2024",
             "source_description":"Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning",

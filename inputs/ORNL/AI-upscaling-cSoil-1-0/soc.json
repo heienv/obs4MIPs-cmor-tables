@@ -22,7 +22,7 @@
     "references": "Wang, Z., Kumar, J., Weintraub-Leff, S. R., Todd-Brown, K., Mishra, U., & Sihi, D. (2024). Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning. Journal of Geophysical Research: Biogeosciences, 129, e2023JG007702. https://doi.org/10.1029/2023JG007702",
     "source_id": "AI-upscaling-cSoil-1-0",
     "title": "AI-upscaling-cSoil 1 (2024): Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning",
-    "variant_info": "Prepared at ORNL from the original Zenodo SOC mean rasters.",
+    "variant_info": "Two depth-specific ensemble members prepared at ORNL from the original Zenodo SOC mean rasters.",
     "variant_label": "ORNL",
     "source_data_url": "https://doi.org/10.5281/zenodo.8057232",
     "source_data_retrieval_date": "20260909",

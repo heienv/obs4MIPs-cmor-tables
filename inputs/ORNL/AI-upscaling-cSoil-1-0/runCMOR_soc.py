@@ -53,9 +53,9 @@ def main():
         metadata = dict(base_metadata)
         metadata["variant_label"] = variants[depth_cm]
         metadata["variant_info"] = (
-            f"Prepared at ORNL from the cumulative 0-{depth_cm} cm SOC mean. "
-            "The depth-specific label distinguishes the two overlapping "
-            "cumulative products."
+            f"Ensemble member {variants[depth_cm]} represents the cumulative "
+            f"0-{depth_cm} cm SOC mean. The two depth intervals overlap and "
+            "must not be summed."
         )
         input_json = output_dir / f"cmor_input_{depth_cm}cm.json"
         input_json.write_text(json.dumps(metadata, indent=2) + "\n")
