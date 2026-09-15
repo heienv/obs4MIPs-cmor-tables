@@ -3,8 +3,8 @@
 import argparse
 import importlib.metadata
 import json
-import subprocess
 from pathlib import Path
+import sys
 
 import cmor
 import netCDF4
@@ -14,15 +14,16 @@ import numpy as np
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPOSITORY_ROOT = SCRIPT_DIR.parents[2]
 TABLES = REPOSITORY_ROOT / "Tables"
+sys.path.append(str(REPOSITORY_ROOT / "inputs" / "misc"))
+import obs4MIPsLib  # noqa: E402
 
 
 def processing_code_location():
-    commit = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=REPOSITORY_ROOT, text=True
-    ).strip()
+    git_commit_number = obs4MIPsLib.get_git_revision_hash()
+    path_to_code = SCRIPT_DIR.relative_to(REPOSITORY_ROOT).as_posix()
     return (
-        "https://github.com/PCMDI/obs4MIPs-cmor-tables/tree/"
-        f"{commit}/inputs/ORNL/AI-upscaling-cSoil-1-0"
+        f"https://github.com/PCMDI/obs4MIPs-cmor-tables/tree/"
+        f"{git_commit_number}/{path_to_code}"
     )
 
 
@@ -39,11 +40,6 @@ def main():
         outpath=str(output_dir),
         has_aux_unc="FALSE",
         processing_code_location=processing_code_location(),
-        comment=(
-            "The complete source rectangle is retained without regridding. "
-            "Cumulative 0-30 cm and 0-100 cm stocks are stored in separate "
-            "files and must not be summed."
-        ),
         history=(
             "Original source raster values and masks retained; latitude and "
             "data rows reversed together; no time coordinate or spatial "
