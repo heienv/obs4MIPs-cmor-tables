@@ -5,7 +5,7 @@ import sys
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-def qc_var_basic(ds, varname, stem_full, level=None):
+def qc_var_basic(ds, varname, stem_full, level=None, tt=0, step=1):
     if varname not in ds.variables:
         print(f"[FAIL] Variable '{varname}' not found in file")
         sys.exit(1)
@@ -66,9 +66,9 @@ def qc_var_basic(ds, varname, stem_full, level=None):
             pval = ds[lev_dim].isel({lev_dim:level}).values
             title_lev = f"plev={level} (@{pval/100:.0f} hPa)"
             print(f"[INFO] Using level index: {level} (dim='{lev_dim}')")
-            data0 = v.isel(time=0, **{lev_dim: level}).values
+            data0 = v.isel(time=tt, **{lev_dim: level}).values
         else:
-            data0 = v.isel(time=0).values
+            data0 = v.isel(time=tt).values
             title_lev = ""
     
     except Exception as e:
@@ -76,9 +76,9 @@ def qc_var_basic(ds, varname, stem_full, level=None):
         sys.exit(1)
 
     if level is not None:
-        print(f"[PASS] Extracted t=0 and lev={level} slice with shape {data0.shape}")
+        print(f"[PASS] Extracted t={tt} and lev={level} slice with shape {data0.shape}")
     else:
-        print(f"[PASS] Extracted t=0 slice with shape {data0.shape}")
+        print(f"[PASS] Extracted t={tt} slice with shape {data0.shape}")
 
     mask = ~np.isfinite(data0) | (data0 == fill)
     nan_count = np.isnan(data0).sum()
@@ -89,14 +89,14 @@ def qc_var_basic(ds, varname, stem_full, level=None):
     valid = data0[~mask]
 
     if valid.size == 0:
-        print("[FAIL] All values are missing at t=0")
+        print(f"[FAIL] All values are missing at t={tt}")
         return
 
     vmin = valid.min()
     vmax = valid.max()
     vmean = valid.mean()
 
-    print(f"[PASS] t=0 stats (excluding fill)")
+    print(f"[PASS] t={tt} stats (excluding fill)")
     print(f"       min  = {vmin}")
     print(f"       max  = {vmax}")
     print(f"       mean = {vmean}")
@@ -111,7 +111,7 @@ def qc_var_basic(ds, varname, stem_full, level=None):
 
     stem = "_".join(stem_full.split("_")[:3])  # first 3 substrings
     lev_tag = f"_lev{level}" if level is not None else ""
-    out_png = out_png = f"{stem}_t0{lev_tag}.png" 
+    out_png = out_png = f"{stem}_t{tt}{lev_tag}.png" 
 
     # Mask missing for plotting
     if varname.lower() in ("pr", "precip", "precipitation"):
@@ -119,13 +119,20 @@ def qc_var_basic(ds, varname, stem_full, level=None):
     else:
         plot_data = np.ma.masked_where(mask, data0)
 
+    #for dataset with very fine horizontal resolution, .e.g, ESACCI snow cover with 18000x3600 cells, 
+    #  coarsening it by setting step=20 as argument
+    plot_lat = lat[::step]
+    plot_lon = lon[::step]
+    plot_data = plot_data[::step, ::step]
+    plot_time = ds["time"].isel(time=tt).dt.strftime("%Y-%m-%d").values
+
     plt.figure(figsize=(8, 4))
-    plt.pcolormesh(lon, lat, plot_data, shading="auto")
+    plt.pcolormesh(plot_lon, plot_lat, plot_data, shading="auto")
     plt.colorbar(label=units)
     if lev_dim is not None and level is not None:
-        plt.title(f"{sname} (t=0, {title_lev})")
+        plt.title(f"{sname} ({plot_time}, {title_lev})")
     else:
-        plt.title(f"{sname} (t=0)")
+        plt.title(f"{sname} ({plot_time})")
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
 
@@ -140,6 +147,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="obs4MIPs quick-look QC"
     )
+    parser.add_argument("-step", type=int, default=1, help="Spatial subsampling step for plotting (default: 1)")
+    parser.add_argument("-time", type=int, default=0, help="Time index to plot (default: 0)")
     parser.add_argument("-var", required=True, help="Variable name (e.g., pr, rsut)")
     parser.add_argument("-dataset", required=True, help="Path to NetCDF file")
     parser.add_argument("-level", type=int, default=None,
@@ -153,7 +162,7 @@ def main():
     ds = xr.open_dataset(args.dataset, decode_times=True)
 
     stem_full = Path(args.dataset).stem
-    qc_var_basic(ds, args.var, stem_full, args.level)
+    qc_var_basic(ds, args.var, stem_full, args.level, args.time, args.step)
 
     print("\nQC completed.\n")
 
