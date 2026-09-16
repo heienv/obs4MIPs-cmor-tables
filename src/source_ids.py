@@ -1,6 +1,17 @@
 source_id = {}
 source_id['source_id'] = {}
 
+key = 'AI-upscaling-cSoil-1-0'
+source_id['source_id'][key] = {}
+source_id['source_id'][key]['source_name'] = 'AI upscaling cSoil'
+source_id['source_id'][key]['source_label'] = 'AI-upscaling-cSoil'
+source_id['source_id'][key]['release_year'] = '2024'
+source_id['source_id'][key]['source_description'] = 'Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning'
+source_id['source_id'][key]['source_version_number'] = '1'
+source_id['source_id'][key]['institution_id'] = 'EmoryU'
+source_id['source_id'][key]['region'] = ['north_america']
+source_id['source_id'][key]['source_type'] = 'AI_upscaling'
+source_id['source_id'][key]['source_variables'] = ['cSoil']
 key = 'ESACCI-SCFG-MODIS-v4-0'
 source_id['source_id'][key] = {}
 source_id['source_id'][key]['source_name'] = 'ESACCI-SCFG-MODIS'
