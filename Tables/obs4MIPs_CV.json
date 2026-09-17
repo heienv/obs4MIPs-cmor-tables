@@ -2433,7 +2433,7 @@
                 "source_version_number":"V3"
             },
             "AI-upscaling-cSoil-1-0":{
-                "region":"contiguous_united_states",
+                "region":"north_america",
                 "source":"AI-upscaling-cSoil 1 (2024): Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning",
                 "source_type":"AI_upscaling",
                 "source_version_number":"1"
@@ -2723,7 +2723,7 @@
             "ESACCI-SCFG-MODIS-v4-0":{
                 "region":"global_land",
                 "source":"ESACCI-SCFG-MODIS v4-0 (2025): Snow Cover Fraction on Ground (SCFG) derived from Terra MODIS data from the ESA SNOW CCI Climate Data Record version 4.0",
-                "source_type":"satellite_blended",
+                "source_type":"satellite_retrieval",
                 "source_version_number":"v4-0"
             },
             "EUMETSAT-CMSAF-GIRAFE-v1":{

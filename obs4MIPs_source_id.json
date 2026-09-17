@@ -36,7 +36,7 @@
         "AI-upscaling-cSoil-1-0":{
             "institution_id":"EmoryU",
             "region":[
-                "contiguous_united_states"
+                "north_america"
             ],
             "release_year":"2024",
             "source_description":"Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning",
@@ -921,10 +921,12 @@
             "source_description":"Snow Cover Fraction on Ground (SCFG) derived from Terra MODIS data from the ESA SNOW CCI Climate Data Record version 4.0",
             "source_label":"ESACCI-SCFG-MODIS",
             "source_name":"ESACCI-SCFG-MODIS",
-            "source_type":"satellite_blended",
+            "source_type":"satellite_retrieval",
             "source_variables":[
                 "sncfg",
-                "sncfv"
+                "sncfgsd",
+                "sncfv",
+                "sncfvsd"
             ],
             "source_version_number":"v4-0"
         },
