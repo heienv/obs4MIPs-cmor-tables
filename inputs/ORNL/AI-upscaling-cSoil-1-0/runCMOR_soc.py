@@ -48,14 +48,23 @@ def main():
     )
 
     products = []
-    variants = {30: "ORNL-r1", 100: "ORNL-r2"}
+    source_ids = {
+        30: "AI-upscaling-0-30cm-cSoil-1-0",
+        100: "AI-upscaling-0-100cm-cSoil-1-0",
+    }
     for depth_cm in (30, 100):
         metadata = dict(base_metadata)
-        metadata["variant_label"] = variants[depth_cm]
+        metadata["source_id"] = source_ids[depth_cm]
+        metadata["title"] = (
+            f"AI-upscaling 0-{depth_cm} cm cSoil 1 (2024): Upscaling "
+            "soil organic carbon measurements at the continental scale "
+            "using multivariate clustering analysis and machine learning"
+        )
+        metadata["variant_label"] = "ORNL"
         metadata["variant_info"] = (
-            f"Ensemble member {variants[depth_cm]} represents the cumulative "
-            f"0-{depth_cm} cm SOC mean. The two depth intervals overlap and "
-            "must not be summed."
+            f"ORNL processing of the published cumulative 0-{depth_cm} cm "
+            "SOC mean. The depth interval is part of the source identity; "
+            "the two products are not ensemble members."
         )
         input_json = output_dir / f"cmor_input_{depth_cm}cm.json"
         input_json.write_text(json.dumps(metadata, indent=2) + "\n")
@@ -115,7 +124,13 @@ def main():
 
         if isinstance(output, bytes):
             output = output.decode()
-        products.append({"depth_cm": [0, depth_cm], "output": output})
+        products.append(
+            {
+                "depth_cm": [0, depth_cm],
+                "source_id": source_ids[depth_cm],
+                "output": output,
+            }
+        )
         print(output, flush=True)
 
     report = {
