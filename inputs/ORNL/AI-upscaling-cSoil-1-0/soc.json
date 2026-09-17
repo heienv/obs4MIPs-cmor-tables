@@ -8,6 +8,8 @@
     "comment": "Complete native source grid retained without cropping or resampling; spatial extent 180°W–55°W, 15°N–80°N. This template is specialized by runCMOR_soc.py for each cumulative depth product.",
     "contact": "Zhuonan Wang (zzw0034@auburn.edu, zw5@ornl.gov); Jitendra Kumar (kumarj@ornl.gov); Debjani Sihi (dsihi@ncsu.edu)",
     "data_specs_version": "ODS-2.6.1",
+    "dataset_contributor": "Zhuonan Wang (zzw0034@auburn.edu; zw5@ornl.gov)",
+    "doi": "10.5281/zenodo.8057232",
     "grid": "30 arc-second latitude x longitude",
     "grid_label": "gn",
     "history": "",
