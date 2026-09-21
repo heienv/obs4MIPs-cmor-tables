@@ -1,17 +1,29 @@
 source_id = {}
 source_id['source_id'] = {}
 
-key = 'AI-upscaling-cSoil-1-0'
+key = 'AI-upscaling-0-30cm-cSoil-1-0'
 source_id['source_id'][key] = {}
-source_id['source_id'][key]['source_name'] = 'AI upscaling cSoil'
-source_id['source_id'][key]['source_label'] = 'AI-upscaling-cSoil'
+source_id['source_id'][key]['source_name'] = 'AI upscaling 0-30 cm cSoil'
+source_id['source_id'][key]['source_label'] = 'AI-upscaling-0-30cm-cSoil'
 source_id['source_id'][key]['release_year'] = '2024'
-source_id['source_id'][key]['source_description'] = 'Upscaling soil organic carbon measurements at the continental scale using multivariate clustering analysis and machine learning'
+source_id['source_id'][key]['source_description'] = 'Upscaled 0-30 cm soil organic carbon stock for the United States using multivariate geographic clustering and machine learning'
 source_id['source_id'][key]['source_version_number'] = '1'
 source_id['source_id'][key]['institution_id'] = 'EmoryU'
 source_id['source_id'][key]['region'] = ['north_america']
 source_id['source_id'][key]['source_type'] = 'AI_upscaling'
-source_id['source_id'][key]['source_variables'] = ['cSoil']
+source_id['source_id'][key]['source_variables'] = ['cSoil0to30cm']
+
+key = 'AI-upscaling-0-100cm-cSoil-1-0'
+source_id['source_id'][key] = {}
+source_id['source_id'][key]['source_name'] = 'AI upscaling 0-100 cm cSoil'
+source_id['source_id'][key]['source_label'] = 'AI-upscaling-0-100cm-cSoil'
+source_id['source_id'][key]['release_year'] = '2024'
+source_id['source_id'][key]['source_description'] = 'Upscaled 0-100 cm soil organic carbon stock for the United States using multivariate geographic clustering and machine learning'
+source_id['source_id'][key]['source_version_number'] = '1'
+source_id['source_id'][key]['institution_id'] = 'EmoryU'
+source_id['source_id'][key]['region'] = ['north_america']
+source_id['source_id'][key]['source_type'] = 'AI_upscaling'
+source_id['source_id'][key]['source_variables'] = ['cSoil0to100cm']
 key = 'ESACCI-SCFG-MODIS-v4-0'
 source_id['source_id'][key] = {}
 source_id['source_id'][key]['source_name'] = 'ESACCI-SCFG-MODIS'
@@ -95,4 +107,3 @@ source_id['source_id'][key]['institution_id'] = 'CRU-UEA'
 source_id['source_id'][key]['region'] = ['global']
 source_id['source_id'][key]['source_type'] = 'gridded_insitu'
 source_id['source_id'][key]['source_variables'] = ['tastosanom']
-
